@@ -69,4 +69,6 @@ main = do
   bs <- if null as then getContents else return []
   if "help" `elem` as
     then mapM_ putStrLn $ "OPERATORS" : "=========" : [h | (_, (_, h)) <- os]
-    else print . flip s [] . foldr b [] $ as ++ words bs
+    else print . flip s [] . foldr b [] $ words bs ++ case as of
+                                                        [a] -> words a
+                                                        _   -> as
