@@ -56,7 +56,7 @@ p :: String -> Maybe (StackItem Double)
 p m = (fmap fst .: lookup) m os <|> Snum <$> (readMay m :: Maybe Double)
 
 s :: [StackItem Double] -> [StackItem Double] -> Maybe Double
-s (Sop (Bop o) : ss) (Snum m : Snum n : ts) = s ss (Snum (m `o` n) : ts)
+s (Sop (Bop o) : ss) (Snum n : Snum m : ts) = s ss (Snum (m `o` n) : ts)
 s (Sop (Uop o) : ss) (Snum m : ts)          = s ss (Snum (o m) : ts)
 s (n:ss) ts                                 = s ss (n : ts)
 s [] (Snum n:_)                             = Just n
