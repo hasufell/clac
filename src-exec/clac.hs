@@ -1,5 +1,6 @@
-{-# LANGUAGE GADTs #-}
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE GADTs              #-}
+{-# LANGUAGE RankNTypes         #-}
+{-# LANGUAGE StandaloneDeriving #-}
 
 {- |
 Module      :  $Header$
@@ -30,10 +31,14 @@ import Plailude
 data StackItem a where
   Snum :: forall a. Fractional a => a -> StackItem a
   Sop  :: Op -> StackItem a
+deriving instance Show a => Show (StackItem a)
 
 data Op where
   Bop :: (forall a. Fractional a => a -> a -> a) -> Op
   Uop :: (forall a. Floating a => a -> a) -> Op
+instance Show Op where
+  show (Bop _) = "binary operator"
+  show (Uop _) = "unary operator"
 
 os :: [(String, (StackItem Double, String))]
 os = [ ( "+",    ( Sop (Bop (+)),    "+:\t\taddition"                 ))
