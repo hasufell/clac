@@ -39,6 +39,7 @@ os :: [(String, (StackItem Double, String))]
 os = [ ( "+",    ( Sop (Bop (+)),    "+:\t\taddition"                 ))
      , ( "-",    ( Sop (Bop (-)),    "-:\t\tsubtraction"              ))
      , ( "*",    ( Sop (Bop (*)),    "*:\t\tmultiplication"           ))
+     , ( "x",    ( Sop (Bop (*)),    "*:\t\tmultiplication"           ))
      , ( "/",    ( Sop (Bop (/)),    "/:\t\tdivision"                 ))
      , ( "neg",  ( Sop (Uop negate), "neg:\t\tnegation"               ))
      , ( "sin",  ( Sop (Uop sin),    "sin:\t\tsine function"          ))
