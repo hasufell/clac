@@ -35,8 +35,8 @@ Straightforward RPN calculator.
 It supports multiple equations.
   $ clac 1 1 + , 2 2 +
 
-For available operators, check the help.
-  $ clac help
+For available operators, check the operator list.
+  $ clac -o
 
 
 TODO
