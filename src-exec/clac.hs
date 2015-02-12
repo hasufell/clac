@@ -55,6 +55,7 @@ os = [ ( "+",    ( Sop (Bop (+)),    "+:\t\taddition"                 ))
      , ( "asin", ( Sop (Uop asin),   "asine:\t\tarcsine function"     ))
      , ( "acos", ( Sop (Uop acos),   "acosine:\tarccosine function"   ))
      , ( "atan", ( Sop (Uop atan),   "arctan:\t\tarctangent function" ))
+     , ( "pi",   ( Sop (C   pi),     "pi:\t\tpi constant"             ))
      ]
 
 b :: String -> [StackItem Double] -> [StackItem Double]
