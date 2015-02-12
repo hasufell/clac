@@ -42,6 +42,6 @@ For available operators, check the help.
 TODO
 ====
 If you want to help, these things should probably be added to clac:
-  - Using Scientific (or something else appropriate) instead of Double
+  - Using something more appropriate than Double
   - Support for implicit multiple equations (currently only supports explicit)
   - Pretty printing
