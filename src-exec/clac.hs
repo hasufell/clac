@@ -50,6 +50,8 @@ os = [ ( "+",    ( Sop (Bop (+)),    "+:\t\taddition"                 ))
      , ( "sin",  ( Sop (Uop sin),    "sin:\t\tsine function"          ))
      , ( "cos",  ( Sop (Uop cos),    "cos:\t\tcosine function"        ))
      , ( "tan",  ( Sop (Uop tan),    "tan:\t\ttangent function"       ))
+     , ( "asin", ( Sop (Uop asin),   "asine:\t\tarcsine function"     ))
+     , ( "acos", ( Sop (Uop acos),   "acosine:\tarccosine function"   ))
      , ( "atan", ( Sop (Uop atan),   "arctan:\t\tarctangent function" ))
      ]
 
