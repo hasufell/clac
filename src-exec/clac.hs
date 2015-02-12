@@ -36,9 +36,11 @@ deriving instance Show a => Show (StackItem a)
 data Op where
   Bop :: (forall a. Fractional a => a -> a -> a) -> Op
   Uop :: (forall a. Floating a => a -> a) -> Op
+  C   :: (forall a. Floating a => a) -> Op
 instance Show Op where
   show (Bop _) = "binary operator"
   show (Uop _) = "unary operator"
+  show (C   a) = "constant: " ++ show (a :: Double)
 
 os :: [(String, (StackItem Double, String))]
 os = [ ( "+",    ( Sop (Bop (+)),    "+:\t\taddition"                 ))
@@ -66,6 +68,7 @@ p m = (fmap fst .: lookup) m os <|> Snum <$> (readMay m :: Maybe Double)
 s :: [StackItem Double] -> [StackItem Double] -> Maybe Double
 s (Sop (Bop o) : ss) (Snum n : Snum m : ts) = s ss (Snum (m `o` n) : ts)
 s (Sop (Uop o) : ss) (Snum m : ts)          = s ss (Snum (o m) : ts)
+s (Sop (C   c) : ss) ts                     = s ss (Snum c : ts)
 s (n:ss) ts                                 = s ss (n : ts)
 s [] (Snum n:_)                             = Just n
 s _ _                                       = Nothing
