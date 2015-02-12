@@ -38,6 +38,9 @@ It supports multiple equations.
 For available operators, check the operator list.
   $ clac -o
 
+To print the entire equation as a tree, run in verbose mode.
+  $ clac -v
+
 
 TODO
 ====
