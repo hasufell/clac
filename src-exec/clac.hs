@@ -16,6 +16,10 @@ import Control.Applicative
   (<|>),
   (<$>),
   )
+import Data.List.Split
+  (
+  splitOn,
+  )
 import Safe
   (
   readMay,
@@ -37,10 +41,12 @@ data Op where
   Bop :: (forall a. Fractional a => a -> a -> a) -> Op
   Uop :: (forall a. Floating a => a -> a) -> Op
   C   :: (forall a. Floating a => a) -> Op
+  Neq :: Op
 instance Show Op where
   show (Bop _) = "binary operator"
   show (Uop _) = "unary operator"
   show (C   a) = "constant: " ++ show (a :: Double)
+  show Neq     = "new equation operator"
 
 os :: [(String, (StackItem Double, String))]
 os = [ ( "+",    ( Sop (Bop (+)),    "+:\t\taddition"                 ))
@@ -56,6 +62,7 @@ os = [ ( "+",    ( Sop (Bop (+)),    "+:\t\taddition"                 ))
      , ( "acos", ( Sop (Uop acos),   "acosine:\tarccosine function"   ))
      , ( "atan", ( Sop (Uop atan),   "arctan:\t\tarctangent function" ))
      , ( "pi",   ( Sop (C   pi),     "pi:\t\tpi constant"             ))
+     , ( ",",    ( Sop Neq,          ",:\t\tstart a new equation"     ))
      ]
 
 b :: String -> [StackItem Double] -> [StackItem Double]
@@ -80,6 +87,7 @@ main = do
   bs <- if null as then getContents else return []
   if "help" `elem` as
     then mapM_ putStrLn $ "OPERATORS" : "=========" : [h | (_, (_, h)) <- os]
-    else print . flip s [] . foldr b [] $ words bs ++ case as of
-                                                        [a] -> words a
-                                                        _   -> as
+    else print . map (flip s [] . foldr b []) . splitOn [","] $
+      words bs ++ case as of
+                    [a] -> words a
+                    _   -> as

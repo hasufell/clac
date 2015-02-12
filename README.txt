@@ -32,6 +32,9 @@ Straightforward RPN calculator.
   $ clac
     1 1 +^D
 
+It supports multiple equations.
+  $ clac 1 1 + , 2 2 +
+
 For available operators, check the help.
   $ clac help
 
@@ -40,5 +43,5 @@ TODO
 ====
 If you want to help, these things should probably be added to clac:
   - Using Scientific (or something else appropriate) instead of Double
-  - Support for multiple equations
+  - Support for implicit multiple equations (currently only supports explicit)
   - Pretty printing
