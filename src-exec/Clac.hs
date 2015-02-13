@@ -188,3 +188,8 @@ solveAll =
   . foldr buildStack []
 
 
+-- |Solve an equation of the form "1 2 +".
+solveEquation :: String -> Maybe Double
+solveEquation = flip solveStack []
+                . foldr buildStack []
+                . words
