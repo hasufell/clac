@@ -1,6 +1,6 @@
 About
 =====
-Very simple CLI RPN calculator. Works with STDIN and arguments.
+Very simple RPN calculator. Works with STDIN and arguments. Also has a gtk version.
 
 
 Install
@@ -16,28 +16,31 @@ Run
 ===
 If your cabal binaries are in $PATH after installing, invoke clac like any
 other program:
-  $ clac
+  $ clac-cli
 
 It can also be ran via cabal (inside a sandbox or not):
-  $ cabal run
+  $ cabal run clac-cli
+
+To run the gtk version:
+  $ cabal run clac-gtk
 
 
 Usage
 =====
 Straightforward RPN calculator.
-  $ clac 1 2 - 3 +
-  $ echo 1 2 - 3 + | clac
-  $ clac
+  $ clac-cli 1 2 - 3 +
+  $ echo 1 2 - 3 + | clac-cli
+  $ clac-cli
     1 1 +^D
 
 It supports multiple equations.
-  $ clac 1 1 + , 2 2 +
+  $ clac-cli 1 1 + , 2 2 +
 
 For available operators, check the operator list.
-  $ clac -o
+  $ clac-cli -o
 
 To print the entire equation as a tree, run in verbose mode.
-  $ clac -v
+  $ clac-cli -v
 
 
 TODO
