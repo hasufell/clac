@@ -68,30 +68,31 @@ import Safe
   )
 
 
-data Opt = MkOpt {h :: Bool
-                 ,v :: Bool
-                 ,e :: [String]
+data Opt = MkOpt {wantHelp    :: Bool
+                 ,wantVerbose :: Bool
+                 ,getEquation :: [String]
                  }
 
 data StackItem a where
-  Snum :: forall a. Fractional a => a -> StackItem a
-  Sop  :: OpDesc -> StackItem a
+  StackNum :: forall a. Fractional a => a -> StackItem a
+  StackOp  :: OpDesc -> StackItem a
 deriving instance Show a => Show (StackItem a)
 
-data OpDesc = Dop {op   :: Op
-                  ,desc :: String
-                  }
+data OpDesc = MkOpDesc {op   :: Op
+                       ,desc :: String
+                       }
+
 instance Show OpDesc where
-  show (Dop _ a) = a
+  show (MkOpDesc _ a) = a
 
 data Op where
-  Bop :: (forall a. Fractional a => a -> a -> a) -> Op
-  Uop :: (forall a. Floating a => a -> a) -> Op
-  C   :: (forall a. Floating a => a) -> Op
-  Neq :: Op
+  BinaryOp :: (forall a. Fractional a => a -> a -> a) -> Op
+  UnaryOp  :: (forall a. Floating   a =>      a -> a) -> Op
+  Constant :: (forall a. Floating   a =>           a) -> Op
+  NewEq    :: Op
 
-ops :: Parser Opt
-ops = MkOpt
+optParser :: Parser Opt
+optParser = MkOpt
   <$> switch
       ( long "operations"
      <> short 'o'
@@ -102,69 +103,84 @@ ops = MkOpt
      <> help "Verbose output" )
   <*> many (strArgument mempty)
 
-os :: [(OpDesc, String)]
-os = [( Dop (Bop (+))    "+",   "+:\t\taddition"                 )
-     ,( Dop (Bop (-))    "-",   "-:\t\tsubtraction"              )
-     ,( Dop (Bop (*))    "*",   "*:\t\tmultiplication"           )
-     ,( Dop (Bop (*))    "x",   "*:\t\tmultiplication"           )
-     ,( Dop (Bop (/))    "/",   "/:\t\tdivision"                 )
-     ,( Dop (Uop negate) "neg", "neg:\t\tnegation"               )
-     ,( Dop (Uop sin)    "sin", "sin:\t\tsine function"          )
-     ,( Dop (Uop cos)    "cos", "cos:\t\tcosine function"        )
-     ,( Dop (Uop tan)    "tan", "tan:\t\ttangent function"       )
-     ,( Dop (Uop asin)   "asin","asine:\t\tarcsine function"     )
-     ,( Dop (Uop acos)   "acos","acosine:\tarccosine function"   )
-     ,( Dop (Uop atan)   "atan","arctan:\t\tarctangent function" )
-     ,( Dop (C   pi)     "pi",  "pi:\t\tpi constant"             )
-     ,( Dop Neq          ",",   ",:\t\tstart a new equation"     )
-     ]
+operators :: [(OpDesc, String)]
+operators =
+  [( MkOpDesc (BinaryOp (+))   "+",    "+:\t\taddition"                 )
+  ,( MkOpDesc (BinaryOp (-))   "-",    "-:\t\tsubtraction"              )
+  ,( MkOpDesc (BinaryOp (*))   "*",    "*:\t\tmultiplication"           )
+  ,( MkOpDesc (BinaryOp (*))   "x",    "*:\t\tmultiplication"           )
+  ,( MkOpDesc (BinaryOp (/))   "/",    "/:\t\tdivision"                 )
+  ,( MkOpDesc (UnaryOp negate) "neg",  "neg:\t\tnegation"               )
+  ,( MkOpDesc (UnaryOp sin)    "sin",  "sin:\t\tsine function"          )
+  ,( MkOpDesc (UnaryOp cos)    "cos",  "cos:\t\tcosine function"        )
+  ,( MkOpDesc (UnaryOp tan)    "tan",  "tan:\t\ttangent function"       )
+  ,( MkOpDesc (UnaryOp asin)   "asin", "asine:\t\tarcsine function"     )
+  ,( MkOpDesc (UnaryOp acos)   "acos", "acosine:\tarccosine function"   )
+  ,( MkOpDesc (UnaryOp atan)   "atan", "arctan:\t\tarctangent function" )
+  ,( MkOpDesc (Constant   pi)  "pi",   "pi:\t\tpi constant"             )
+  ,( MkOpDesc NewEq            ",",    ",:\t\tstart a new equation"     )
+  ]
 
-b :: String -> [StackItem Double] -> [StackItem Double]
-b x ac = case p x of
-           Just q  -> q:ac
-           Nothing -> ac
+buildStack :: String -> [StackItem Double] -> [StackItem Double]
+buildStack str ac = case parseStack str of
+                      Just q  -> q:ac
+                      Nothing -> ac
 
-p :: String -> Maybe (StackItem Double)
-p m = (Sop <$> find ((== m) . desc) (fst <$> os))
-  <|> Snum <$> (readMay m :: Maybe Double)
+parseStack :: String -> Maybe (StackItem Double)
+parseStack str = (StackOp <$> find ((== str) . desc) (fst <$> operators))
+                 <|> StackNum <$> (readMay str :: Maybe Double)
 
-t :: [StackItem Double] -> Tree String
-t (Sop (Dop (Bop _) i):j:k) = Node i [t k, t [j]]
-t (Sop (Dop (Uop _) i):j)   = Node i [t j]
-t (Sop (Dop (C _  ) i):_)   = Node i []
-t (Snum i:_)                = Node (show i) []
-t _                         = Node "¯\\_(ツ)_/¯" []
+stackTree :: [StackItem Double] -> Tree String
+stackTree (StackOp (MkOpDesc (BinaryOp _) i):j:k) =
+  Node i [stackTree k, stackTree [j]]
+stackTree (StackOp (MkOpDesc (UnaryOp _) i):j) =
+  Node i [stackTree j]
+stackTree (StackOp (MkOpDesc (Constant _  ) i):_) =
+  Node i []
+stackTree (StackNum i:_) =
+  Node (show i) []
+stackTree _  =
+  Node "¯\\_(ツ)_/¯" []
 
-s :: [StackItem Double] -> [StackItem Double] -> Maybe Double
-s (Sop (Dop (Bop o) _):ss) (Snum n:Snum m:ts) = s ss (Snum (m `o` n):ts)
-s (Sop (Dop (Uop o) _):ss) (Snum m:ts)        = s ss (Snum (o m):ts)
-s (Sop (Dop (C   c) _):ss) ts                 = s ss (Snum c:ts)
-s (n:ss) ts                                   = s ss (n:ts)
-s [] (Snum n:_)                               = Just n
-s _ _                                         = Nothing
+solveStack :: [StackItem Double] -> [StackItem Double] -> Maybe Double
+solveStack (StackOp (MkOpDesc (BinaryOp o) _):ss) (StackNum n:StackNum m:ts) =
+  solveStack ss (StackNum (m `o` n):ts)
+solveStack (StackOp (MkOpDesc (UnaryOp o) _):ss) (StackNum m:ts) =
+  solveStack ss (StackNum (o m):ts)
+solveStack (StackOp (MkOpDesc (Constant   c) _):ss) ts =
+  solveStack ss (StackNum c:ts)
+solveStack (n:ss) ts =
+  solveStack ss (n:ts)
+solveStack [] (StackNum n:_) =
+  Just n
+solveStack _ _ =
+  Nothing
 
-sa :: [[String]] -> [(Maybe Double, String)]
-sa = map $ (second drawVerticalTree . (((,) . flip s [])
- <*> (t . reverse))) . foldr b []
+solveAll :: [[String]] -> [(Maybe Double, String)]
+solveAll =
+  map
+  $ (second drawVerticalTree . (((,) . flip solveStack [])
+    <*> (stackTree . reverse)))
+  . foldr buildStack []
 
 calc :: Opt -> IO ()
-calc o = do
-  cs <- if null (e o) then getContents else return []
-  let es = splitOn [","] $ words cs ++ case e o of
+calc opt = do
+  cs <- if null (getEquation opt) then getContents else return []
+  let es = splitOn [","] $ words cs ++ case getEquation opt of
                                          [a] -> words a
-                                         _   -> e o
-  if h o
-    then mapM_ putStrLn $ "OPERATORS":"=========":map snd os
+                                         _   -> getEquation opt
+  if wantHelp opt
+    then mapM_ putStrLn $ "OPERATORS":"=========":map snd operators
     else
       mapM_ (\(solution, tree) -> do
-        when (v o) $ putStrLn $ "\n\n" ++ tree
+        when (wantVerbose opt) $ putStrLn $ "\n\n" ++ tree
         print solution
-        putStrLn $ replicate (length $ show solution) '=') $ sa es
+        putStrLn $ replicate (length $ show solution) '=') $ solveAll es
 
 main :: IO ()
 main = execParser o >>= calc
   where o =
-          info (helper <*> ops)
+          info (helper <*> optParser)
           ( fullDesc
-         <> progDesc "simple CLI RPN calculator"
-         <> header   "clac" )
+          <> progDesc "simple CLI RPN calculator"
+          <> header   "clac" )
