@@ -9,8 +9,9 @@ Copyright  : (c) Alexander Berntsen 2015
 License    : GPL-3
 
 Maintainer : alexander@plaimi.net
--} module Main where
 
+-}
+module Main where
 import Control.Applicative
   (
   (<$>),
