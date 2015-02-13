@@ -21,7 +21,7 @@ $ clac
   1 1 +^D
 @
 -}
-module Main where
+module Clac where
 
 import Control.Applicative
   (
@@ -216,10 +216,4 @@ calc opt = do
         print solution
         putStrLn $ replicate (length $ show solution) '=') $ solveAll es
 
-main :: IO ()
-main = execParser o >>= calc
-  where o =
-          info (helper <*> optParser)
-          ( fullDesc
-          <> progDesc "simple CLI RPN calculator"
-          <> header   "clac" )
+

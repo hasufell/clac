@@ -11,8 +11,9 @@ category:              Math
 build-type:            Simple
 cabal-version:         >=1.10
 
-executable clac
-  main-is:             clac.hs
+executable clac-cli
+  main-is:             Cli.hs
+  other-modules:       Clac
   other-extensions:    GADTs
                        RankNTypes
                        StandaloneDeriving
