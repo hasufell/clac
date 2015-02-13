@@ -47,4 +47,4 @@ TODO
 If you want to help, these things should probably be added to clac:
   - Using something more appropriate than Double
   - Support for implicit multiple equations (currently only supports explicit)
-  - Pretty printing
+  - Better pretty printing (intermediate calculations for instance)
