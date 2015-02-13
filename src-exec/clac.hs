@@ -10,8 +10,19 @@ License    : GPL-3
 
 Maintainer : alexander@plaimi.net
 
+A very simple CLI RPN calculator. Works with STDIN and arguments.
+
+Usage examples:
+
+@
+$ clac 1 2 - 3 +
+$ echo 1 2 - 3 + | clac
+$ clac
+  1 1 +^D
+@
 -}
 module Main where
+
 import Control.Applicative
   (
   (<$>),
@@ -69,16 +80,22 @@ import Safe
   )
 
 
+-- |Holds information about the user passed options.
 data Opt = MkOpt {wantHelp    :: Bool
                  ,wantVerbose :: Bool
                  ,getEquation :: [String]
                  }
 
+-- |An item on the calculator stack. Can either be a constant number,
+-- or an operator.
 data StackItem a where
+  -- A constant number on the stack, such as '3'.
   StackNum :: forall a. Fractional a => a -> StackItem a
+  -- An operator on the stack, such as '+', '-' etc.
   StackOp  :: OpDesc -> StackItem a
 deriving instance Show a => Show (StackItem a)
 
+-- |Operator-description binding.
 data OpDesc = MkOpDesc {op   :: Op
                        ,desc :: String
                        }
@@ -86,12 +103,14 @@ data OpDesc = MkOpDesc {op   :: Op
 instance Show OpDesc where
   show (MkOpDesc _ a) = a
 
+-- |The valid operator classes.
 data Op where
   BinaryOp :: (forall a. Fractional a => a -> a -> a) -> Op
   UnaryOp  :: (forall a. Floating   a =>      a -> a) -> Op
   Constant :: (forall a. Floating   a =>           a) -> Op
   NewEq    :: Op
 
+-- |Parser for the user requested options.
 optParser :: Parser Opt
 optParser = MkOpt
   <$> switch
@@ -104,6 +123,7 @@ optParser = MkOpt
      <> help "Verbose output" )
   <*> many (strArgument mempty)
 
+-- |Predefined operator stack. This reflects the current program features.
 operators :: [(OpDesc, String)]
 operators =
   [( MkOpDesc (BinaryOp (+))   "+",    "+:\t\taddition"                 )
@@ -122,15 +142,22 @@ operators =
   ,( MkOpDesc NewEq            ",",    ",:\t\tstart a new equation"     )
   ]
 
-buildStack :: String -> [StackItem Double] -> [StackItem Double]
+-- |Build the calculator stack. Usually used in conjunction with foldr,
+-- to build the complete stack consecutively.
+buildStack :: String             -- ^ one equation item
+           -> [StackItem Double] -- ^ prepend the result to this stack
+           -> [StackItem Double]
 buildStack str ac = case parseStack str of
                       Just q  -> q:ac
                       Nothing -> ac
 
-parseStack :: String -> Maybe (StackItem Double)
+-- |Parse an equation item.
+parseStack :: String                   -- ^ one equation item
+           -> Maybe (StackItem Double) -- ^ converted stack item, if valid
 parseStack str = (StackOp <$> find ((== str) . desc) (fst <$> operators))
                  <|> StackNum <$> (readMay str :: Maybe Double)
 
+-- |Build a tree from a calculator stack, suitable for pretty printing.
 stackTree :: [StackItem Double] -> Tree String
 stackTree (StackOp (MkOpDesc (BinaryOp _) i):j:k) =
   Node i [stackTree k, stackTree [j]]
@@ -143,7 +170,10 @@ stackTree (StackNum i:_) =
 stackTree _  =
   Node "¯\\_(ツ)_/¯" []
 
-solveStack :: [StackItem Double] -> [StackItem Double] -> Maybe Double
+-- |Solve a stack.
+solveStack :: [StackItem Double]  -- ^ stack to solve
+           -> [StackItem Double]  -- ^ stack used for zipping, initially empty
+           -> Maybe Double        -- ^ calculation result
 solveStack (StackOp (MkOpDesc (BinaryOp o) _):ss) (StackNum n:StackNum m:ts) =
   solveStack ss (StackNum (m `o` n):ts)
 solveStack (StackOp (MkOpDesc (UnaryOp o) _):ss) (StackNum m:ts) =
@@ -157,6 +187,13 @@ solveStack [] (StackNum n:_) =
 solveStack _ _ =
   Nothing
 
+-- |Solve multiple equations of an input list such as:
+--
+-- > [["1","1","+"],["2","2","+"]]
+--
+-- This gives back a tuple for each equation where the first value
+-- is the result of the equation (if any) and the second one
+-- is a String representing the stackTree, suitable for printing.
 solveAll :: [[String]] -> [(Maybe Double, String)]
 solveAll =
   map
@@ -164,6 +201,7 @@ solveAll =
     <*> (stackTree . reverse)))
   . foldr buildStack []
 
+-- |Run the calculator with the given options.
 calc :: Opt -> IO ()
 calc opt = do
   cs <- if null (getEquation opt) then getContents else return []
