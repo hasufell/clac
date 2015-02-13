@@ -5,7 +5,6 @@ Very simple CLI RPN calculator. Works with STDIN and arguments.
 
 Install
 =======
-
 clac is installed using cabal:
   $ cabal install
 
@@ -15,7 +14,6 @@ It works well in a sandbox too:
 
 Run
 ===
-
 If your cabal binaries are in $PATH after installing, invoke clac like any
 other program:
   $ clac
@@ -44,7 +42,6 @@ To print the entire equation as a tree, run in verbose mode.
 
 TODO
 ====
-If you want to help, these things should probably be added to clac:
   - Using something more appropriate than Double
   - Support for implicit multiple equations (currently only supports explicit)
   - Better pretty printing (intermediate calculations for instance)
