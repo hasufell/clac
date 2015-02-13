@@ -33,17 +33,9 @@ import Control.Arrow
   (
   second,
   )
-import Control.Monad
-  (
-  when,
-  )
 import Data.List
   (
   find,
-  )
-import Data.List.Split
-  (
-  splitOn,
   )
 import Data.Monoid
   (
@@ -61,15 +53,9 @@ import Data.Tree.Pretty
 import Options.Applicative
   (
   Parser,
-  execParser,
-  fullDesc,
-  header,
   help,
-  helper,
-  info,
   long,
   many,
-  progDesc,
   short,
   strArgument,
   switch,
@@ -200,20 +186,5 @@ solveAll =
   $ (second drawVerticalTree . (((,) . flip solveStack [])
     <*> (stackTree . reverse)))
   . foldr buildStack []
-
--- |Run the calculator with the given options.
-calc :: Opt -> IO ()
-calc opt = do
-  cs <- if null (getEquation opt) then getContents else return []
-  let es = splitOn [","] $ words cs ++ case getEquation opt of
-                                         [a] -> words a
-                                         _   -> getEquation opt
-  if wantHelp opt
-    then mapM_ putStrLn $ "OPERATORS":"=========":map snd operators
-    else
-      mapM_ (\(solution, tree) -> do
-        when (wantVerbose opt) $ putStrLn $ "\n\n" ++ tree
-        print solution
-        putStrLn $ replicate (length $ show solution) '=') $ solveAll es
 
 
