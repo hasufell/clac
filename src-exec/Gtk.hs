@@ -1,6 +1,6 @@
 {- |
 Module     : $Header$
-Description:  GTK UI
+Description: GTK UI
 Copyright  : (c) Julian Ospald 2015
 License    : GPL-3
 

@@ -1,6 +1,6 @@
 {- |
 Module     : $Header$
-Description:  cli client
+Description: cli client
 Copyright  : (c) Alexander Berntsen 2015
 License    : GPL-3
 

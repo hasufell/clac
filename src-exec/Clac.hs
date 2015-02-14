@@ -4,7 +4,7 @@
 
 {- |
 Module     : $Header$
-Description:  calculator logic
+Description: calculator logic
 Copyright  : (c) Alexander Berntsen 2015
 License    : GPL-3
 
