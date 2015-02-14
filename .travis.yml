@@ -1,14 +1,14 @@
 language: haskell
 notifications:
-  email: false
+    email: false
 env:
     global:
-        secure: "c25/Tr2DHEMjF2GK+EzXjG+3bYNyjAkhXEgaO0JM9qdMBbcNCaIXEpl7N8s7DI+gnGNu2vrqARWA429f9Za18RSRoHaEBjoWomoakpa6cr0qiQSJzj961srxgoJ7f3j2zJnJH/q5OVLtseqBGEls1UYkcgFqJNmXUjoAI30xS8s="
+        secure: "VSs2EnclSXbSI1aJXhqYcVpEgxVsVg3RJrGkBPXSleZdUIIvi1T2eg7qFz8DfjCOwMbBjLPCq5+e6Ieq4HexhdxnZYvry4LY39SDelHxajMV+Bh8otO/2+9nPND/D1JQ69Q3D9+gBDBiA59DWezZ+IM3esu67myVrX7yX9S1wSo="
 before_install:
     - sudo apt-get install libglade2-0 libglade2-dev libgtk2.0-0 libgtk2.0-common libgtk2.0-dev
     - cabal install gtk2hs-buildtools
     - cabal install haddock
     - cabal install hscolour
-after_install:
+after_script:
     - cabal haddock --all --hyperlink-source
     - ./update-gh-pages.sh
