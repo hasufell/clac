@@ -1,3 +1,22 @@
+{- |
+Module     : $Header$
+Description: Clac cli client.
+Copyright  : (c) Alexander Berntsen 2015
+License    : GPL-3
+
+Maintainer : alexander@plaimi.net
+
+A very simple CLI RPN calculator. Works with STDIN and arguments.
+
+Usage examples:
+
+@
+$ clac 1 2 - 3 +
+$ echo 1 2 - 3 + | clac
+$ clac
+  1 1 +^D
+@
+-}
 module Main where
 
 import Clac
