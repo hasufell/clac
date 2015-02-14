@@ -1,3 +1,15 @@
+{- |
+Module     : $Header$
+Description: GTK UI for clac.
+Copyright  : (c) Julian Ospald 2015
+License    : GPL-3
+
+Maintainer : hasufell@posteo.de
+
+This module sets up the GTK UI for clac.
+-}
+module Main where
+
 import Control.Monad.IO.Class
 import Clac
 import Graphics.UI.Gtk
