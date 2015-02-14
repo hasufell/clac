@@ -1,6 +1,6 @@
 {- |
 Module     : $Header$
-Description: Clac cli client.
+Description:  cli client
 Copyright  : (c) Alexander Berntsen 2015
 License    : GPL-3
 
