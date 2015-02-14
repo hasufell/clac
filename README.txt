@@ -1,3 +1,9 @@
+Build Status
+=====
+
+[![Build Status](https://travis-ci.org/hasufell/clac.png)](https://travis-ci.org/hasufell/clac)
+
+
 About
 =====
 Very simple RPN calculator. Works with STDIN and arguments. Also has a gtk version.
