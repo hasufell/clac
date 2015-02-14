@@ -1,7 +1,7 @@
 name:                  clac
 version:               0.3.0
-synopsis:              Simple CLI RPN calculator
-description:           Simple CLI RPN calculator.
+synopsis:              Simple RPN calculator
+description:           Simple RPN calculator.
 license:               GPL-3
 license-file:          LICENSE
 author:                Alexander Berntsen
